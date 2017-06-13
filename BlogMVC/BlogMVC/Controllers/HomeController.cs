@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BlogMVC.Models;
+using PagedList;
+using System.Data.Entity;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Web.Mvc;
 
 namespace BlogMVC.Controllers
@@ -10,21 +11,38 @@ namespace BlogMVC.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("ListCategories");
         }
-
-        public ActionResult About()
+        public ActionResult ListCategories()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            using (var database = new BlogDbContext())
+            {
+                var categories = database.Categories.
+                    Include(n => n.Name).
+                    OrderBy(n => n.Name).
+                    ToList();
+                return View(categories);
+            }
         }
-
-        public ActionResult Contact()
+        public ActionResult ListArticles(int? categoryId, int? page)
         {
-            ViewBag.Message = "Your contact page.";
+            if (categoryId == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
-            return View();
+            using (var database = new BlogDbContext())
+            {
+                var articles = database.Articles
+                    .Where(a => a.CategoryId == categoryId)
+                    .Include(a => a.Author)
+                    .Include(a => a.Tags);
+
+                int pageSize = 3;
+                int pageNumber = (page ?? 1);
+
+                return View(articles.OrderBy(a => a.Title).ToPagedList(pageNumber, pageSize));
+            }
         }
     }
 }
