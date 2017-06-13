@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BlogMVC.Models;
+using PagedList;
+using System.Data.Entity;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Web.Mvc;
 
 namespace BlogMVC.Controllers
@@ -10,36 +11,41 @@ namespace BlogMVC.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("ListCategories");
         }
-<<<<<<< HEAD
+
         public ActionResult ListCategories()
         {
             using (var database = new BlogDbContext())
             {
-                var categories = database.Categories.
-                    Include(n => n.Articles).
-                    OrderBy(n => n.Name).
-                    ToList();
+                var categories = database.Categories
+                    .Include(c => c.Articles)
+                    .OrderBy(c => c.Name)
+                    .ToList();
+
                 return View(categories);
             }
         }
+
         public ActionResult ListArticles(int? categoryId, int? page)
-=======
-
-        public ActionResult About()
->>>>>>> parent of f720c89... add categories controller
         {
-            ViewBag.Message = "Your application description page.";
+            if (categoryId == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
-            return View();
-        }
+            using (var database = new BlogDbContext())
+            {
+                var articles = database.Articles
+                    .Where(a => a.CategoryId == categoryId)
+                    .Include(a => a.Author)
+                    .Include(a => a.Tags);
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+                int pageSize = 3;
+                int pageNumber = (page ?? 1);
 
-            return View();
+                return View(articles.OrderBy(a => a.Title).ToPagedList(pageNumber, pageSize));
+            }
         }
     }
 }
