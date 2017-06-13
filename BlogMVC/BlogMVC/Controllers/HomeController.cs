@@ -18,7 +18,7 @@ namespace BlogMVC.Controllers
             using (var database = new BlogDbContext())
             {
                 var categories = database.Categories.
-                    Include(n => n.Name).
+                    Include(n => n.Articles).
                     OrderBy(n => n.Name).
                     ToList();
                 return View(categories);
