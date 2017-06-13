@@ -285,10 +285,10 @@
     <Content Include="Views\Article\Details.cshtml" />
     <Content Include="Views\Article\Edit.cshtml" />
     <Content Include="Views\Article\List.cshtml" />
+    <Content Include="Views\Tag\List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Tag\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
